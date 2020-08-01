@@ -8,9 +8,12 @@ class NeuralNetwork:
     # layers is an array whose i'th
     # element indicates the size of the i'th
     # layer
-    def __init__(self, layers):
+    def __init__(self, layers, activation, cost):
         self.num_of_layers = len(layers)
         self.layers = layers
+
+        self.activation = activation
+        self.cost = cost
 
         # random.randn generates array of your specified dimension
         # bias is a multidimensional array whose i'th entry
@@ -27,14 +30,14 @@ class NeuralNetwork:
             self.bias, self.weights = pickle.load(pkl)
 
     def save_network(self):
-        network = (self.bias, self.weights)
+        network = (self.bias, self.weights, self.activation, self.cost)
         with open("network.pkl", "wb") as pkl:
             pickle.dump(network, pkl)
 
     # input is an array indicating values of neurons in the first layer
     def forward_prop(self, inp):
         for b, w in zip(self.bias, self.weights):
-            inp = self.sigmoid(np.dot(w, inp) + b)
+            inp = self.activation.fn(np.dot(w, inp) + b)
         return inp
 
     def back_prop(self, inp, out):
@@ -48,12 +51,12 @@ class NeuralNetwork:
             # print(w.shape, b.shape)
             z = np.dot(w, prev_layer) + b
             interim_val.append(z)
-            prev_layer = self.sigmoid(z)
+            prev_layer = self.activation.fn(z)
             layers.append(prev_layer)
 
         # Calculate error in the last layer
-        delC_A = layers[-1] - out
-        delta = delC_A * self.sigmoid_prime(interim_val[-1])
+        delta = self.cost.delta(layers[-1], out, interim_val[-1],
+                                self.activation)
         db[-1] = delta
         dw[-1] = np.dot(delta, layers[-2].transpose())
 
@@ -62,7 +65,7 @@ class NeuralNetwork:
         for i in range(2, self.num_of_layers):
             z = interim_val[-i]
             delta = np.dot(self.weights[-i + 1].transpose(),
-                           delta) * self.sigmoid_prime(z)
+                           delta) * self.activation.prime(z)
             db[-i] = delta
             dw[-i] = np.dot(delta, layers[-i - 1].transpose())
 
@@ -108,11 +111,3 @@ class NeuralNetwork:
         result = [(np.argmax(self.forward_prop(inp)), out)
                   for (inp, out) in test_set]
         return sum(int(nn == actual) for (nn, actual) in result)
-
-    # sigmoid is the activation function being used
-    def sigmoid(self, z):
-        z = np.clip(z, -500, 500)
-        return 1.0/(1.0 + np.exp(-z))
-
-    def sigmoid_prime(self, z):
-        return self.sigmoid(z)*(1-self.sigmoid(z))

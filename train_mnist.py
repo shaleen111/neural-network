@@ -1,12 +1,14 @@
-import neural_network as nn
+import nn.neural_network as nn
+import nn.activations as a
+import nn.cost_functions as c
 import numpy as np
-import mnist_reader as m
 import pickle
 
 
 def main():
     # create neural network
-    digit_recognizer = nn.NeuralNetwork([784, 30, 10])
+    digit_recognizer = nn.NeuralNetwork([784, 30, 10], a.Sigmoid,
+                                        c.MeanSquaredError)
 
     # load mnist data
     with open("mnist_training.pkl", "rb") as d:
@@ -20,11 +22,11 @@ def main():
                 for inp, out in training]
 
     test = [(np.reshape(inp, (784, 1))/255, out) for inp, out in test]
-    digit_recognizer.load_network("network.pkl")
-    correct = digit_recognizer.perf_check(test)
-    print(f"{correct}/10000")
-    # digit_recognizer.SGD(training, 30, 10, 3.0, test=test)
-    # digit_recognizer.save_network()
+    # digit_recognizer.load_network("network.pkl")
+    # correct = digit_recognizer.perf_check(test)
+    # print(f"{correct}/10000")
+    digit_recognizer.SGD(training, 30, 10, 3.0, test=test)
+    digit_recognizer.save_network()
 
 
 def v_out(out):
