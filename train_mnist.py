@@ -7,8 +7,8 @@ import pickle
 
 def main():
     # create neural network
-    digit_recognizer = nn.NeuralNetwork([784, 30, 10], a.Sigmoid,
-                                        c.MeanSquaredError)
+    digit_recognizer = nn.NeuralNetwork([784, 50, 10], a.Sigmoid,
+                                        c.CrossEntropyLoss)
 
     # load mnist data
     with open("mnist_training.pkl", "rb") as d:
@@ -25,8 +25,8 @@ def main():
     # digit_recognizer.load_network("network.pkl")
     # correct = digit_recognizer.perf_check(test)
     # print(f"{correct}/10000")
-    digit_recognizer.SGD(training, 30, 10, 3.0, test=test)
-    digit_recognizer.save_network()
+    digit_recognizer.SGD(training, 30, 10, 0.50, test=test)
+    digit_recognizer.save_network("MSE.pkl")
 
 
 def v_out(out):

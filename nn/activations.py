@@ -9,4 +9,4 @@ class Sigmoid():
 
     @staticmethod
     def prime(z):
-        return np.exp(-z) / (1 + np.exp(-z)) ** 2
+        return Sigmoid.fn(z)*(1-Sigmoid.fn(z))

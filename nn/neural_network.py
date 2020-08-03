@@ -27,11 +27,12 @@ class NeuralNetwork:
 
     def load_network(self, path):
         with open(path, "rb") as pkl:
-            self.bias, self.weights = pickle.load(pkl)
+            self.bias, self.weights, self.activation, self.cost = \
+                pickle.load(pkl)
 
-    def save_network(self):
+    def save_network(self, path):
         network = (self.bias, self.weights, self.activation, self.cost)
-        with open("network.pkl", "wb") as pkl:
+        with open(path, "wb") as pkl:
             pickle.dump(network, pkl)
 
     # input is an array indicating values of neurons in the first layer

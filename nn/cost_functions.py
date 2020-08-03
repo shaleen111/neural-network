@@ -6,4 +6,6 @@ class MeanSquaredError():
 
 
 class CrossEntropyLoss():
-    pass
+    @staticmethod
+    def delta(result, expected, z, activation):
+        return (result - expected)
